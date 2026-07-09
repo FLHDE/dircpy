@@ -9,16 +9,19 @@ void RemoveReadOnly(LPCWSTR filePath)
 {
     DWORD fileAttributes = GetFileAttributesW(filePath);
 
+    if (fileAttributes == INVALID_FILE_ATTRIBUTES)
+        return;
+
     if ((fileAttributes & FILE_ATTRIBUTE_READONLY) == FILE_ATTRIBUTE_READONLY)
     {
-        fileAttributes ^= FILE_ATTRIBUTE_READONLY;
+        fileAttributes &= ~FILE_ATTRIBUTE_READONLY;
         SetFileAttributesW(filePath, fileAttributes);
     }
 }
 
 bool IsWine()
 {
-    HMODULE ntdllHandle = LoadLibraryA("ntdll.dll");
+    HMODULE ntdllHandle = GetModuleHandleA("ntdll.dll");
     return GetProcAddress(ntdllHandle, "wine_get_version") != nullptr;
 }
 
